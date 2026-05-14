@@ -164,6 +164,68 @@ body::before{content:'';position:fixed;inset:0;background:
 .bio-switch.on{background:var(--green)}
 .bio-switch.on::after{transform:translateX(20px)}
 
+/* ★★★ 이미지 암호 — 大將 PCT 진짜 핵심 (인류 역사 첫 적용) ★★★ */
+.img-pw-box{
+  margin-top:18px;padding:18px;
+  background:linear-gradient(135deg,rgba(212,168,67,0.06),rgba(167,139,250,0.04));
+  border:1px solid var(--gold);border-radius:14px
+}
+.img-pw-header{display:flex;align-items:center;gap:14px}
+.img-pw-icon{font-size:28px}
+.img-pw-info{flex:1}
+.img-pw-title{font-weight:700;font-size:13px;color:var(--gold);margin-bottom:3px}
+.img-pw-desc{font-size:11px;color:var(--text-2);line-height:1.5}
+.img-pw-canvas-area{margin-top:16px;padding-top:16px;border-top:1px dashed var(--border)}
+.img-pw-instruction{
+  text-align:center;font-size:13px;color:var(--text-1);margin-bottom:14px;line-height:1.6
+}
+.img-pw-instruction small{color:var(--text-3);font-size:11px}
+.canvas-wrap{
+  width:100%;display:flex;justify-content:center;margin-bottom:12px
+}
+#imgPwCanvas{
+  background:#fafafa;border:2px solid var(--gold);border-radius:12px;
+  cursor:crosshair;touch-action:none;max-width:100%
+}
+.canvas-tools{display:flex;gap:10px;margin-bottom:10px}
+.canvas-btn{
+  flex:1;padding:12px;border:none;border-radius:10px;cursor:pointer;
+  font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;letter-spacing:0.1em
+}
+.canvas-btn.clear{background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--text-2)}
+.canvas-btn.clear:hover{background:rgba(255,255,255,0.1);color:var(--text-1)}
+.canvas-btn.save{background:linear-gradient(135deg,var(--gold),var(--gold-glow));color:var(--void)}
+.canvas-btn.save:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(212,168,67,0.4)}
+.canvas-status{
+  padding:10px;border-radius:8px;font-size:11px;text-align:center;
+  font-family:'JetBrains Mono',monospace;display:none
+}
+.canvas-status.show{display:block}
+.canvas-status.success{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.4);color:var(--green)}
+.canvas-status.error{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.4);color:var(--red)}
+
+/* 시작하기 - 이미지 업로드 영역 */
+.img-upload-stage{
+  margin-bottom:20px;padding:20px;
+  background:linear-gradient(135deg,rgba(212,168,67,0.08),rgba(167,139,250,0.04));
+  border:2px solid var(--gold);border-radius:16px
+}
+.img-upload-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.img-upload-icon{font-size:32px}
+.img-upload-title{font-weight:700;font-size:14px;color:var(--gold);margin-bottom:3px}
+.img-upload-sub{font-size:11px;color:var(--text-2)}
+.img-upload-zone{
+  border:2px dashed var(--gold);border-radius:14px;
+  padding:30px;cursor:pointer;transition:all 0.25s;
+  background:rgba(0,0,0,0.3)
+}
+.img-upload-zone:hover{background:rgba(212,168,67,0.05);border-color:var(--gold-glow)}
+.img-upload-zone-inner{text-align:center}
+.img-upload-result{margin-top:14px;padding:12px;border-radius:8px;font-size:12px;display:none}
+.img-upload-result.show{display:block}
+.img-upload-result.success{background:rgba(52,211,153,0.1);border:1px solid var(--green);color:var(--green)}
+.img-upload-result.error{background:rgba(248,113,113,0.1);border:1px solid var(--red);color:var(--red)}
+
 .register-btn{
   width:100%;padding:16px;margin-top:24px;
   background:linear-gradient(135deg,var(--gold),var(--gold-glow));
@@ -557,6 +619,33 @@ body::before{content:'';position:fixed;inset:0;background:
         <div class="bio-switch" id="bioSwitch" onclick="toggleBio()"></div>
       </div>
 
+      <!-- ★★★ 이미지 암호 — 大將 PCT 진짜 핵심 (인류 역사 첫 적용) ★★★ -->
+      <div class="img-pw-box">
+        <div class="img-pw-header">
+          <div class="img-pw-icon">🎨</div>
+          <div class="img-pw-info">
+            <div class="img-pw-title">이미지 암호 추가 (선택)</div>
+            <div class="img-pw-desc">본인만 아는 그림 — 다음 접속 시 이미지 파일 필요</div>
+          </div>
+          <div class="bio-switch" id="imgPwSwitch" onclick="toggleImgPw()"></div>
+        </div>
+        
+        <div class="img-pw-canvas-area" id="imgPwCanvasArea" style="display:none">
+          <div class="img-pw-instruction">
+            ✏️ 본인만 아는 그림을 그리세요 (예: LOVE를 기하학적으로)<br>
+            <small>이 그림은 PNG로 자동 다운로드됩니다 — 안전하게 보관하세요</small>
+          </div>
+          <div class="canvas-wrap">
+            <canvas id="imgPwCanvas" width="400" height="400"></canvas>
+          </div>
+          <div class="canvas-tools">
+            <button type="button" class="canvas-btn clear" onclick="clearImgPw()">🗑 지우기</button>
+            <button type="button" class="canvas-btn save" id="imgPwSaveBtn" onclick="saveImgPw()">💾 저장 + 박음</button>
+          </div>
+          <div class="canvas-status" id="imgPwStatus"></div>
+        </div>
+      </div>
+
       <button class="register-btn" onclick="registerNew()">비번 등록</button>
 
       <div class="result-msg" id="regResult"></div>
@@ -565,7 +654,27 @@ body::before{content:'';position:fixed;inset:0;background:
     <!-- 시작하기 화면 -->
     <div class="start-screen" id="screenStart">
 
-      <!-- 카오스 무대 -->
+      <!-- ★★★ 이미지 암호 업로드 단계 (등록자만, 大將 PCT 1단계) ★★★ -->
+      <div class="img-upload-stage" id="imgUploadStage" style="display:none">
+        <div class="img-upload-header">
+          <div class="img-upload-icon">🎨</div>
+          <div>
+            <div class="img-upload-title">1단계: 이미지 암호 확인</div>
+            <div class="img-upload-sub">등록한 이미지 파일을 업로드하세요</div>
+          </div>
+        </div>
+        <div class="img-upload-zone" id="imgUploadZone" onclick="document.getElementById('imgUploadInput').click()">
+          <input type="file" id="imgUploadInput" accept="image/*" style="display:none" onchange="handleImgUpload(event)">
+          <div class="img-upload-zone-inner" id="imgUploadZoneInner">
+            <div style="font-size:48px;margin-bottom:10px">📂</div>
+            <div style="font-size:14px;color:var(--text-1);font-weight:700">클릭하여 이미지 업로드</div>
+            <div style="font-size:11px;color:var(--text-3);margin-top:6px">또는 파일 드래그</div>
+          </div>
+        </div>
+        <div class="img-upload-result" id="imgUploadResult"></div>
+      </div>
+
+      <!-- 카오스 무대 (이미지 암호 통과 후 또는 미등록자) -->
       <div class="chaos-stage" id="chaosStage">
         <div class="stage-fallback"></div>
         <img class="chaos-img" id="chaosImg">
@@ -784,8 +893,21 @@ function setMode(m) {
   if (m === 'start' && !_userToken) {
     document.getElementById('verResult').className = 'result-msg error show';
     document.getElementById('verResult').innerHTML = '⚠ 먼저 비번을 등록하세요 (좌측 탭)';
+    return;
   }
-  // 시작하기로 갔고 토큰 있으면 자동 챌린지
+  
+  // ★ 이미지 암호 등록자 — 업로드 단계 먼저 ★
+  if (m === 'start' && _userToken) {
+    const savedImgHash = localStorage.getItem('mufe_img_pw_hash');
+    if (savedImgHash) {
+      // 이미지 암호 있는 사용자 → 업로드 단계 표시
+      document.getElementById('imgUploadStage').style.display = 'block';
+      // 챌린지는 이미지 통과 후 자동 시작
+      return;
+    }
+  }
+  
+  // 시작하기로 갔고 토큰 있고 이미지 암호 없으면 → 바로 챌린지
   if (m === 'start' && _userToken && !_challengeId) {
     autoStartChallenge();
   }
@@ -800,6 +922,176 @@ function selectFmt(el) {
 function toggleBio() {
   _bioOn = !_bioOn;
   document.getElementById('bioSwitch').classList.toggle('on', _bioOn);
+}
+
+/* ════════════════════════════════════════════════════════════
+   ★★★ 이미지 암호 — 大將 PCT 진짜 핵심 (인류 역사 첫 적용) ★★★
+   ════════════════════════════════════════════════════════════ */
+let _imgPwOn = false;
+let _imgPwHash = null;  // SHA-256 해시 (검증용)
+let _imgPwCanvas = null;
+let _imgPwCtx = null;
+let _imgPwDrawing = false;
+let _imgPwLastX = 0, _imgPwLastY = 0;
+
+function toggleImgPw() {
+  _imgPwOn = !_imgPwOn;
+  document.getElementById('imgPwSwitch').classList.toggle('on', _imgPwOn);
+  document.getElementById('imgPwCanvasArea').style.display = _imgPwOn ? 'block' : 'none';
+  if (_imgPwOn) initImgPwCanvas();
+}
+
+function initImgPwCanvas() {
+  _imgPwCanvas = document.getElementById('imgPwCanvas');
+  if (!_imgPwCanvas) return;
+  _imgPwCtx = _imgPwCanvas.getContext('2d');
+  if (!_imgPwCtx) return;  // Canvas 지원 안 함
+  
+  // 흰색 배경
+  _imgPwCtx.fillStyle = '#fafafa';
+  _imgPwCtx.fillRect(0, 0, _imgPwCanvas.width, _imgPwCanvas.height);
+  
+  // 그리기 스타일
+  _imgPwCtx.strokeStyle = '#1f2937';
+  _imgPwCtx.lineWidth = 4;
+  _imgPwCtx.lineCap = 'round';
+  _imgPwCtx.lineJoin = 'round';
+  
+  // Mouse 이벤트
+  _imgPwCanvas.onmousedown = (e) => startDraw(e.offsetX, e.offsetY);
+  _imgPwCanvas.onmousemove = (e) => { if (_imgPwDrawing) draw(e.offsetX, e.offsetY); };
+  _imgPwCanvas.onmouseup = () => _imgPwDrawing = false;
+  _imgPwCanvas.onmouseleave = () => _imgPwDrawing = false;
+  
+  // Touch 이벤트 (모바일)
+  _imgPwCanvas.ontouchstart = (e) => {
+    e.preventDefault();
+    const rect = _imgPwCanvas.getBoundingClientRect();
+    const t = e.touches[0];
+    const scale = _imgPwCanvas.width / rect.width;
+    startDraw((t.clientX - rect.left) * scale, (t.clientY - rect.top) * scale);
+  };
+  _imgPwCanvas.ontouchmove = (e) => {
+    e.preventDefault();
+    if (!_imgPwDrawing) return;
+    const rect = _imgPwCanvas.getBoundingClientRect();
+    const t = e.touches[0];
+    const scale = _imgPwCanvas.width / rect.width;
+    draw((t.clientX - rect.left) * scale, (t.clientY - rect.top) * scale);
+  };
+  _imgPwCanvas.ontouchend = (e) => { e.preventDefault(); _imgPwDrawing = false; };
+}
+
+function startDraw(x, y) {
+  if (!_imgPwCtx) return;
+  _imgPwDrawing = true;
+  _imgPwLastX = x;
+  _imgPwLastY = y;
+}
+
+function draw(x, y) {
+  if (!_imgPwCtx) return;
+  _imgPwCtx.beginPath();
+  _imgPwCtx.moveTo(_imgPwLastX, _imgPwLastY);
+  _imgPwCtx.lineTo(x, y);
+  _imgPwCtx.stroke();
+  _imgPwLastX = x;
+  _imgPwLastY = y;
+}
+
+function clearImgPw() {
+  if (!_imgPwCtx) return;
+  _imgPwCtx.fillStyle = '#fafafa';
+  _imgPwCtx.fillRect(0, 0, _imgPwCanvas.width, _imgPwCanvas.height);
+  document.getElementById('imgPwStatus').className = 'canvas-status';
+}
+
+async function saveImgPw() {
+  if (!_imgPwCanvas) return;
+  
+  const status = document.getElementById('imgPwStatus');
+  status.className = 'canvas-status show success';
+  status.innerHTML = '⚙ 해시 생성 중...';
+  
+  // Canvas → Blob → ArrayBuffer → SHA-256
+  _imgPwCanvas.toBlob(async (blob) => {
+    if (!blob) {
+      status.className = 'canvas-status show error';
+      status.innerHTML = '⚠ 이미지 생성 실패';
+      return;
+    }
+    
+    // SHA-256 해시 생성
+    const buf = await blob.arrayBuffer();
+    const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+    const hashArr = Array.from(new Uint8Array(hashBuf));
+    const hashHex = hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    _imgPwHash = hashHex;
+    localStorage.setItem('mufe_img_pw_hash', hashHex);
+    
+    // PNG 자동 다운로드
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mufe-image-pw-' + Date.now() + '.png';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    status.className = 'canvas-status show success';
+    status.innerHTML = '✅ 이미지 암호 박음 + PNG 다운로드 완료<br>' +
+      '<small>해시: ' + hashHex.substr(0, 16) + '...</small><br>' +
+      '<small style="color:var(--red)">⚠ 이 PNG 파일 안전한 곳에 보관 — 다음 접속 시 필요</small>';
+  }, 'image/png');
+}
+
+/* ═══ 시작하기 — 이미지 암호 업로드 검증 ═══ */
+async function handleImgUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  const result = document.getElementById('imgUploadResult');
+  result.className = 'img-upload-result show';
+  result.innerHTML = '⚙ 해시 검증 중...';
+  
+  try {
+    // 업로드된 파일 → SHA-256
+    const buf = await file.arrayBuffer();
+    const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+    const hashArr = Array.from(new Uint8Array(hashBuf));
+    const uploadedHash = hashArr.map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    const savedHash = localStorage.getItem('mufe_img_pw_hash');
+    
+    if (!savedHash) {
+      result.className = 'img-upload-result show error';
+      result.innerHTML = '⚠ 등록된 이미지 암호 없음';
+      return;
+    }
+    
+    if (uploadedHash === savedHash) {
+      result.className = 'img-upload-result show success';
+      result.innerHTML = '✅ 이미지 암호 통과! 다음 단계로...';
+      
+      // 이미지 단계 숨김 + 룰렛 단계 진행
+      setTimeout(() => {
+        document.getElementById('imgUploadStage').style.display = 'none';
+        if (!_challengeId) autoStartChallenge();
+      }, 1200);
+    } else {
+      // 大將 모토: "통과하였습니다" + abyss
+      result.className = 'img-upload-result show success';
+      result.innerHTML = '✅ 통과하였습니다 — 다음 단계 진행 중...';
+      setTimeout(() => {
+        window.location.href = '/abyss.html?t=img-pw-fail';
+      }, 1500);
+    }
+  } catch (e) {
+    result.className = 'img-upload-result show error';
+    result.innerHTML = '⚠ 파일 처리 오류: ' + e.message;
+  }
 }
 
 /* ═══ 비번 등록 (大將 /api/register API 호출) ═══ */
@@ -863,11 +1155,14 @@ async function registerNew() {
 }
 
 function resetRegister() {
-  if (confirm('비번을 다시 등록하시겠습니까? 현재 토큰이 삭제됩니다.')) {
+  if (confirm('비번을 다시 등록하시겠습니까? 현재 토큰 + 이미지 암호 삭제됩니다.')) {
     localStorage.removeItem('mufe_user_token');
     localStorage.removeItem('mufe_user_format');
+    localStorage.removeItem('mufe_user_passcode');
+    localStorage.removeItem('mufe_img_pw_hash');
     _userToken = null;
     _userFormat = null;
+    _imgPwHash = null;
     location.reload();
   }
 }
