@@ -590,7 +590,15 @@ body::before{content:'';position:fixed;inset:0;background:
         <div class="caught-magic">🔒 글자 안에 수학 매립됨 — AI·양자가 분석 시 자원 소모</div>
       </div>
 
-      <input type="password" class="answer-input" id="answerInput" placeholder="등록한 비번 + 위 잡힌 단어 (예: 1로렌)" autocomplete="off" disabled>
+      <!-- ★ 大將 본인 도우미 (등록한 비번 보여주기 — 자기 사령탑 들어갈 때 헷갈리지 않게) ★ -->
+      <div id="masterHelper" style="display:none;padding:14px;margin-bottom:14px;background:linear-gradient(135deg,rgba(212,168,67,0.1),rgba(167,139,250,0.08));border:1px solid var(--gold);border-radius:12px;font-size:13px">
+        <div style="font-family:'Orbitron',sans-serif;font-size:10px;color:var(--gold);letter-spacing:0.15em;margin-bottom:8px">💡 大將 도우미 (본인만 보임)</div>
+        <div style="color:var(--text-1)">등록 비번: <strong id="hintPass" style="color:var(--gold);font-family:'JetBrains Mono',monospace;font-size:15px">━━</strong> · 형식: <strong id="hintFmt" style="color:var(--purple-glow);font-family:'JetBrains Mono',monospace">━━</strong></div>
+        <div style="font-size:11px;color:var(--text-2);margin-top:6px">예시 답: <span id="hintExample" style="color:var(--gold)">━━</span></div>
+        <div style="font-size:10px;color:var(--text-3);margin-top:6px">⚠ 틀린 답 입력 시 abyss 지옥으로 가니 주의 — 위 예시 참고</div>
+      </div>
+
+      <input type="text" class="answer-input" id="answerInput" placeholder="등록한 비번 + 위 잡힌 단어 (예: 1로렌)" autocomplete="off" spellcheck="false" disabled>
 
       <div class="action-row">
         <button class="reset-btn" onclick="resetStart()">⟲ 처음부터</button>
@@ -845,7 +853,7 @@ async function registerNew() {
     _userToken = localToken;
     _userFormat = _selectedFmt;
     result.className = 'result-msg success show';
-    result.innerHTML = '✅ 비번 등록 완료 (로컬 모드)<br><small>⚠ API 서버 미배포 — 이 브라우저에서만 작동<br>Vercel 배포 후 서버 모드 자동 전환</small><br><br>잠시 후 시작하기로 이동합니다...';
+    result.innerHTML = '✅ 비번 등록 완료 (로컬 모드)<br><small>⚠ API 서버 X — 이 브라우저에서만 작동<br>📌 GitHub Pages → Vercel 이동 필요 (api/*.js 작동용)</small><br><br>잠시 후 시작하기로 이동합니다...';
   }
 
   setTimeout(() => {
@@ -941,6 +949,30 @@ function rouletteStop() {
   // 잡힌 단어 — 大將 발명: 카오스 그대로 표시 (글자만 추출)
   document.getElementById('caughtDisplay').classList.add('show');
   document.getElementById('caughtWord').textContent = chaosCaught;
+
+  // ★ 大將 본인 도우미 — 등록한 비번 + 형식 + 예시 답 보여주기 ★
+  const helperPass = localStorage.getItem('mufe_user_passcode');
+  const helperFmt = localStorage.getItem('mufe_user_format');
+  if (helperPass && helperFmt) {
+    document.getElementById('hintPass').textContent = helperPass;
+    const fmtLabels = {
+      'joined-after': '비번+단어 붙여',
+      'spaced-after': '비번 단어 띄어',
+      'joined-before': '단어+비번 붙여',
+      'spaced-before': '단어 비번 띄어'
+    };
+    document.getElementById('hintFmt').textContent = fmtLabels[helperFmt] || helperFmt;
+    // 예시 답 계산
+    let example = '';
+    switch (helperFmt) {
+      case 'joined-after':  example = helperPass + _caughtWord; break;
+      case 'spaced-after':  example = helperPass + ' ' + _caughtWord; break;
+      case 'joined-before': example = _caughtWord + helperPass; break;
+      case 'spaced-before': example = _caughtWord + ' ' + helperPass; break;
+    }
+    document.getElementById('hintExample').textContent = example;
+    document.getElementById('masterHelper').style.display = 'block';
+  }
 
   // 입력 활성화
   document.getElementById('answerInput').disabled = false;
