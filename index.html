@@ -880,6 +880,43 @@ let _caughtWord = null;
 /* 시작 시 토큰 있으면 자동 시작하기 모드 */
 window.addEventListener('DOMContentLoaded', () => {
   console.log('[CGO-FULI] DOMContentLoaded - 시작');
+  
+  // ★★★ MUFE 봇 자동 격리 — ref 파라미터로 들어온 봇은 즉시 abyss ★★★
+  // FULI 메인 앱의 mufe-card.js에서 봇 감지 후 redirect 한 경우
+  try {
+    const params = new URLSearchParams(location.search);
+    const ref = params.get('ref');
+    const botRefs = ['honey', 'fuli-stealth', 'fuli-auto', 'honey-card', 'honey-fetch'];
+    
+    if (ref && botRefs.indexOf(ref) !== -1) {
+      console.log('[MUFE] 🎭 봇 감지 자동 격리: ref=' + ref);
+      // 봇 정보 logging (관리용)
+      try {
+        const botInfo = {
+          ref: ref,
+          id: params.get('id') || '',
+          time: Date.now(),
+          userAgent: navigator.userAgent.slice(0, 200),
+          stealthScore: sessionStorage.getItem('mufe_stealth_score') || '',
+          honeyTriggered: sessionStorage.getItem('mufe_honey_triggered') || ''
+        };
+        sessionStorage.setItem('mufe_bot_logged', JSON.stringify(botInfo));
+      } catch (e) {}
+      
+      // 즉시 abyss로 (사용자 화면 안 보이게)
+      const abyssUrl = '/abyss.html?t=auto-bot&ref=' + encodeURIComponent(ref);
+      try { window.location.replace(abyssUrl); } catch(e) {}
+      try { window.location.href = abyssUrl; } catch(e) {}
+      try { document.location.href = abyssUrl; } catch(e) {}
+      // 화면 가림 (redirect 전 0.1초 동안)
+      try { 
+        document.documentElement.style.cssText = 'opacity:0;pointer-events:none'; 
+      } catch(e) {}
+      return; // 다음 코드 실행 안 함
+    }
+  } catch (e) {
+    console.warn('[MUFE] ref 분석 에러:', e);
+  }
   console.log('[CGO-FULI] 토큰:', _userToken ? '있음' : '없음');
   console.log('[CGO-FULI] 이미지 해시:', localStorage.getItem('mufe_img_pw_hash') ? '있음' : '없음');
   
