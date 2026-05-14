@@ -662,10 +662,11 @@ body::before{content:'';position:fixed;inset:0;background:
       <div class="img-upload-stage" id="imgUploadStage" style="display:none">
         <div class="img-upload-header">
           <div class="img-upload-icon">🎨</div>
-          <div>
+          <div style="flex:1">
             <div class="img-upload-title">1단계: 이미지 암호 확인</div>
             <div class="img-upload-sub">등록한 이미지 파일을 업로드하세요</div>
           </div>
+          <button onclick="skipImgUpload()" title="이미지 암호 사용 안 함" style="background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;color:var(--text-2);font-size:11px;font-family:'Orbitron',sans-serif;letter-spacing:0.05em">건너뛰기 ×</button>
         </div>
         <div class="img-upload-zone" id="imgUploadZone" onclick="document.getElementById('imgUploadInput').click()">
           <input type="file" id="imgUploadInput" accept="image/*" style="display:none" onchange="handleImgUpload(event)">
@@ -901,6 +902,17 @@ window.addEventListener('DOMContentLoaded', () => {
 
 /* ═══ 모드 전환 ═══ */
 /* ═══ 페이지 닫기 / 접기 ═══ */
+/* ═══ 이미지 암호 건너뛰기 (옛 해시 있는 경우 또는 잊은 경우) ═══ */
+function skipImgUpload() {
+  if (confirm('이미지 암호를 사용하지 않고 진행하시겠습니까?\n\n현재 등록된 이미지 암호가 제거됩니다.\n다음 접속 시 이미지 업로드 단계가 사라집니다.')) {
+    localStorage.removeItem('mufe_img_pw_hash');
+    _imgPwHash = null;
+    document.getElementById('imgUploadStage').style.display = 'none';
+    // 룰렛 자동 시작
+    if (!_challengeId) autoStartChallenge();
+  }
+}
+
 function closeEntry() {
   if (confirm('CGO-FULI 사령탑 입구를 닫으시겠습니까?')) {
     document.getElementById('entry').style.display = 'none';
@@ -989,7 +1001,21 @@ function toggleImgPw() {
   _imgPwOn = !_imgPwOn;
   document.getElementById('imgPwSwitch').classList.toggle('on', _imgPwOn);
   document.getElementById('imgPwCanvasArea').style.display = _imgPwOn ? 'block' : 'none';
-  if (_imgPwOn) initImgPwCanvas();
+  
+  if (_imgPwOn) {
+    initImgPwCanvas();
+  } else {
+    // ★ 토글 OFF — 大將 모토: 선택 안 하면 진짜 제거 ★
+    localStorage.removeItem('mufe_img_pw_hash');
+    _imgPwHash = null;
+    // 캔버스 초기화
+    if (_imgPwCtx) {
+      _imgPwCtx.fillStyle = '#fafafa';
+      _imgPwCtx.fillRect(0, 0, _imgPwCanvas.width, _imgPwCanvas.height);
+    }
+    const status = document.getElementById('imgPwStatus');
+    if (status) status.className = 'canvas-status';
+  }
 }
 
 function initImgPwCanvas() {
@@ -1156,7 +1182,13 @@ async function registerNew() {
     return;
   }
 
-  // ★ 이미지 암호 토글 ON인데 아직 저장 안 했으면 자동 저장 ★
+  // ★ 토글 OFF면 이전 박혀있던 이미지 해시도 제거 (大將 모토: 선택 안 하면 진짜 X) ★
+  if (!_imgPwOn) {
+    localStorage.removeItem('mufe_img_pw_hash');
+    _imgPwHash = null;
+  }
+
+  // ★ 이미지 암호 토글 ON인데 아직 저장 안 했으면 막음 ★
   if (_imgPwOn && !localStorage.getItem('mufe_img_pw_hash')) {
     result.className = 'result-msg error show';
     result.innerHTML = '⚠ 이미지 암호 토글이 ON 상태인데 아직 그리지 않았거나 [💾 저장 + 박음] 누르지 않았습니다.<br><small>이미지 암호 박스에서 그림 그리고 저장 버튼 누르세요.<br>또는 토글 OFF 하시면 이미지 암호 없이 진행됩니다.</small>';
