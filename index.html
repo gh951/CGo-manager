@@ -878,15 +878,23 @@ let _caughtWord = null;
 
 /* 시작 시 토큰 있으면 자동 시작하기 모드 */
 window.addEventListener('DOMContentLoaded', () => {
+  console.log('[CGO-FULI] DOMContentLoaded - 시작');
+  console.log('[CGO-FULI] 토큰:', _userToken ? '있음' : '없음');
+  console.log('[CGO-FULI] 이미지 해시:', localStorage.getItem('mufe_img_pw_hash') ? '있음' : '없음');
+  
   if (_userToken) {
     setMode('start');
     // ★ 이미지 암호 등록자는 이미지 통과까지 챌린지 X ★
     const savedImgHash = localStorage.getItem('mufe_img_pw_hash');
-    if (!savedImgHash) {
-      // 이미지 암호 없는 사용자만 자동 챌린지
+    if (savedImgHash) {
+      console.log('[CGO-FULI] 이미지 암호 사용자 → 업로드 영역 표시, 룰렛 대기');
+      // 확실하게 이미지 업로드 영역 보이게
+      const stage = document.getElementById('imgUploadStage');
+      if (stage) stage.style.display = 'block';
+    } else {
+      console.log('[CGO-FULI] 일반 사용자 → 룰렛 자동 시작');
       autoStartChallenge();
     }
-    // 이미지 암호 등록자는 handleImgUpload에서 통과 후 자동 챌린지 시작
   }
   initFirebase();
 });
@@ -1201,6 +1209,17 @@ async function registerNew() {
   setTimeout(() => {
     setMode('start');
     document.getElementById('statusBox').style.display = 'flex';
+    
+    // ★ 명시적 분기 — 이미지 암호 박았으면 업로드 영역, 아니면 룰렛 ★
+    const savedImgHash = localStorage.getItem('mufe_img_pw_hash');
+    if (savedImgHash) {
+      console.log('[CGO-FULI] 등록 후 - 이미지 통과 대기');
+      const stage = document.getElementById('imgUploadStage');
+      if (stage) stage.style.display = 'block';
+    } else {
+      console.log('[CGO-FULI] 등록 후 - 룰렛 자동 시작');
+      if (!_challengeId) autoStartChallenge();
+    }
   }, 1800);
 }
 
