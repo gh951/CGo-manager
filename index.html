@@ -245,14 +245,31 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* 잡힌 단어 표시 */
 .caught-display{
-  text-align:center;padding:14px;margin-bottom:14px;
-  background:linear-gradient(135deg,rgba(167,139,250,0.15),rgba(124,58,237,0.1));
-  border:1px solid var(--purple);border-radius:12px;
+  text-align:center;padding:18px;margin-bottom:14px;
+  background:rgba(167,243,208,0.08);
+  border:2px solid #10b981;border-radius:14px;
   display:none
 }
 .caught-display.show{display:block;animation:fadeIn 0.4s}
-.caught-label{font-size:11px;color:var(--purple);letter-spacing:0.15em;font-family:'Orbitron',sans-serif;margin-bottom:6px}
-.caught-word{font-family:'Orbitron',sans-serif;font-size:24px;font-weight:900;color:var(--purple-glow);letter-spacing:0.05em}
+.caught-label{font-size:12px;color:#10b981;letter-spacing:0.15em;font-family:'Noto Sans KR',sans-serif;font-weight:700;margin-bottom:10px}
+.caught-word-box{
+  background:rgba(0,0,0,0.5);border-radius:10px;padding:24px 16px;margin:8px 0;
+  display:flex;align-items:center;justify-content:center;min-height:80px
+}
+.caught-word{
+  font-family:'JetBrains Mono',monospace;font-size:42px;font-weight:900;
+  color:#10b981;letter-spacing:0.02em;
+  text-shadow:0 0 20px rgba(16,185,129,0.5);
+  word-break:break-all;line-height:1.2
+}
+@media (max-width:600px){.caught-word{font-size:30px}}
+.caught-hint{
+  font-size:13px;color:var(--text-2);margin-top:12px
+}
+.caught-hint strong{color:var(--text-1)}
+.caught-magic{
+  font-size:11px;color:var(--purple);margin-top:8px;font-weight:500
+}
 
 /* 답 입력 */
 .answer-input{
@@ -547,8 +564,13 @@ body::before{content:'';position:fixed;inset:0;background:
       <button class="stop-btn" id="stopBtn" onclick="rouletteStop()">■ STOP — 단어 잡기</button>
 
       <div class="caught-display" id="caughtDisplay">
-        <div class="caught-label">잡힌 단어</div>
-        <div class="caught-word" id="caughtWord">━━</div>
+        <div class="caught-label">✓ 단어 잡힘</div>
+        <div class="caught-label" style="color:var(--text-2);margin-bottom:4px">잡힌 단어</div>
+        <div class="caught-word-box">
+          <div class="caught-word" id="caughtWord">━━</div>
+        </div>
+        <div class="caught-hint">이제 답 입력하세요: <strong>등록한 비번 + 위 단어</strong></div>
+        <div class="caught-magic">🔒 글자 안에 수학 매립됨 — AI·양자가 분석 시 자원 소모</div>
       </div>
 
       <input type="password" class="answer-input" id="answerInput" placeholder="등록한 비번 + 위 잡힌 단어 (예: 1로렌)" autocomplete="off" disabled>
@@ -887,13 +909,15 @@ function rouletteStop() {
   clearInterval(_rouletteTimer);
   clearInterval(_imgRotateTimer);
 
-  // 깨끗한 단어 추출
+  // 깨끗한 단어 추출 (검증용 — 내부 보관)
   _caughtWord = _rotationWords[Math.floor(Math.random() * _rotationWords.length)];
-  document.getElementById('chaosText').textContent = makeChaosText(_caughtWord);
+  // 카오스 문장 생성 (사용자가 직접 글자 추출해야 함)
+  const chaosCaught = makeChaosText(_caughtWord);
+  document.getElementById('chaosText').textContent = chaosCaught;
 
-  // 잡힌 단어 표시
+  // 잡힌 단어 — 大將 발명: 카오스 그대로 표시 (글자만 추출)
   document.getElementById('caughtDisplay').classList.add('show');
-  document.getElementById('caughtWord').textContent = _caughtWord;
+  document.getElementById('caughtWord').textContent = chaosCaught;
 
   // 입력 활성화
   document.getElementById('answerInput').disabled = false;
