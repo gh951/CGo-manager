@@ -846,7 +846,7 @@ function startRouletteAndImage() {
     const img = document.getElementById('chaosImg');
     img.onload = () => img.classList.add('show');
     img.onerror = () => img.classList.remove('show');
-    img.src = '/카오스 추가 이미지/chaos-' + n + '.png.jpeg';
+    img.src = '/무폐 이미지/chaos-' + n + '.png.jpeg';
   }
   rotateImage();
   _imgRotateTimer = setInterval(rotateImage, 800);
