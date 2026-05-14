@@ -766,35 +766,53 @@ async function registerNew() {
     return;
   }
 
+  // API 서버 호출 시도 → 실패 시 클라이언트 모드로 폴백
+  let useApi = true;
+  let data = null;
+
   try {
     const res = await fetch('/api/register', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({passcode: pass, format: _selectedFmt})
     });
-    const data = await res.json();
-
-    if (data.status === 'success' && data.token) {
-      localStorage.setItem('mufe_user_token', data.token);
-      localStorage.setItem('mufe_user_format', _selectedFmt);
-      _userToken = data.token;
-      _userFormat = _selectedFmt;
-
-      result.className = 'result-msg success show';
-      result.innerHTML = '✅ ' + data.message + '<br><small>' + (data.detail || '') + '</small><br><br>잠시 후 시작하기로 이동합니다...';
-
-      setTimeout(() => {
-        setMode('start');
-        document.getElementById('statusBox').style.display = 'flex';
-      }, 1500);
-    } else {
-      result.className = 'result-msg error show';
-      result.innerHTML = '⚠ ' + (data.error || '등록 실패');
-    }
+    // 응답이 JSON인지 확인
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) throw new Error('API 미배포');
+    data = await res.json();
   } catch (e) {
-    result.className = 'result-msg error show';
-    result.innerHTML = '⚠ 네트워크 오류: ' + e.message;
+    useApi = false;
   }
+
+  if (useApi && data && data.status === 'success' && data.token) {
+    // 서버 모드 — 진짜 토큰
+    localStorage.setItem('mufe_user_token', data.token);
+    localStorage.setItem('mufe_user_format', _selectedFmt);
+    _userToken = data.token;
+    _userFormat = _selectedFmt;
+    result.className = 'result-msg success show';
+    result.innerHTML = '✅ ' + data.message + '<br><small>' + (data.detail || '') + '</small><br><br>잠시 후 시작하기로 이동합니다...';
+  } else {
+    // 클라이언트 모드 — 로컬 토큰 생성 (서버 배포 전 임시)
+    const localToken = 'mufe-u-local.' + btoa(JSON.stringify({
+      passcode: pass,
+      format: _selectedFmt,
+      issuedAt: Date.now(),
+      mode: 'client-fallback'
+    })) + '.local';
+    localStorage.setItem('mufe_user_token', localToken);
+    localStorage.setItem('mufe_user_format', _selectedFmt);
+    localStorage.setItem('mufe_user_passcode', pass);
+    _userToken = localToken;
+    _userFormat = _selectedFmt;
+    result.className = 'result-msg success show';
+    result.innerHTML = '✅ 비번 등록 완료 (로컬 모드)<br><small>⚠ API 서버 미배포 — 이 브라우저에서만 작동<br>Vercel 배포 후 서버 모드 자동 전환</small><br><br>잠시 후 시작하기로 이동합니다...';
+  }
+
+  setTimeout(() => {
+    setMode('start');
+    document.getElementById('statusBox').style.display = 'flex';
+  }, 1800);
 }
 
 function resetRegister() {
@@ -818,6 +836,8 @@ async function autoStartChallenge() {
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({})
     });
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) throw new Error('API 미배포');
     const data = await res.json();
 
     if (!data.challengeId || !data.rotationWords) throw new Error('서버 응답 오류');
@@ -891,6 +911,10 @@ async function submitAnswer() {
   document.getElementById('verifyBtn').disabled = true;
   document.getElementById('verifyBtn').textContent = '검증 중...';
 
+  // API 호출 시도 → 실패 시 클라이언트 검증
+  let useApi = true;
+  let data = null;
+
   try {
     const res = await fetch('/api/verify', {
       method: 'POST',
@@ -902,17 +926,52 @@ async function submitAnswer() {
         answer: answer
       })
     });
-    const data = await res.json();
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) throw new Error('API 미배포');
+    data = await res.json();
+  } catch (e) {
+    useApi = false;
+  }
 
-    if (data.status === 'success') {
-      // 진짜 통과
-      localStorage.setItem('mufe_session_token', data.token);
-      result.className = 'result-msg success show';
-      result.innerHTML = '✅ ' + data.message;
-      setTimeout(() => {
-        document.getElementById('entry').classList.add('hidden');
-        document.getElementById('cmdShell').classList.add('show');
-        initShell();
+  // ═══ 클라이언트 폴백 검증 ═══
+  if (!useApi) {
+    const localPass = localStorage.getItem('mufe_user_passcode');
+    const localFmt = localStorage.getItem('mufe_user_format');
+
+    if (localPass && localFmt && _caughtWord) {
+      // 大將 4형식으로 진짜 답 계산
+      let realAnswer = '';
+      switch (localFmt) {
+        case 'joined-after':  realAnswer = localPass + _caughtWord; break;
+        case 'spaced-after':  realAnswer = localPass + ' ' + _caughtWord; break;
+        case 'joined-before': realAnswer = _caughtWord + localPass; break;
+        case 'spaced-before': realAnswer = _caughtWord + ' ' + localPass; break;
+      }
+
+      if (answer === realAnswer) {
+        data = {status: 'success', token: 'mufe-local-success', message: '정답입니다. 통과 다음 단계로'};
+      } else {
+        data = {status: 'decoy', token: 'mufe-local-decoy', message: '정답입니다. 통과 다음 단계로'};
+      }
+    } else {
+      result.className = 'result-msg error show';
+      result.innerHTML = '⚠ 로컬 검증 실패 — 비번 다시 등록 필요';
+      document.getElementById('verifyBtn').disabled = false;
+      document.getElementById('verifyBtn').textContent = '인증 검증';
+      return;
+    }
+  }
+
+  // ═══ 응답 처리 (서버든 클라이언트든 동일) ═══
+  if (data && data.status === 'success') {
+    // 진짜 통과
+    localStorage.setItem('mufe_session_token', data.token);
+    result.className = 'result-msg success show';
+    result.innerHTML = '✅ ' + data.message;
+    setTimeout(() => {
+      document.getElementById('entry').classList.add('hidden');
+      document.getElementById('cmdShell').classList.add('show');
+      initShell();
       }, 1000);
     } else if (data.status === 'decoy') {
       // 가짜 통과 → abyss
@@ -924,16 +983,10 @@ async function submitAnswer() {
       }, 1000);
     } else {
       result.className = 'result-msg error show';
-      result.innerHTML = '⚠ ' + (data.error || '응답 오류');
+      result.innerHTML = '⚠ ' + ((data && data.error) || '응답 오류');
       document.getElementById('verifyBtn').disabled = false;
       document.getElementById('verifyBtn').textContent = '인증 검증';
     }
-  } catch (e) {
-    result.className = 'result-msg error show';
-    result.innerHTML = '⚠ ' + e.message;
-    document.getElementById('verifyBtn').disabled = false;
-    document.getElementById('verifyBtn').textContent = '인증 검증';
-  }
 }
 
 function resetStart() {
