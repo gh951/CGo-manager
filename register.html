@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>CGO-FULI 사령탑 — 大將 등록</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#050810;--void-2:#0a0f1f;--void-3:#0f1832;
+  --gold:#d4a843;--gold-glow:#f0c060;--purple:#a78bfa;
+  --green:#34d399;--red:#f87171;
+  --text-1:rgba(245,230,175,0.95);--text-2:rgba(200,185,140,0.7);--text-3:rgba(200,185,140,0.45);
+  --border:rgba(212,168,67,0.25);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  font-family:'Noto Sans KR',sans-serif;background:linear-gradient(135deg,var(--void) 0%,var(--void-2) 50%,var(--void-3) 100%);
+  color:var(--text-1);min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px
+}
+.box{
+  max-width:520px;width:100%;
+  background:rgba(13,20,38,0.7);border:1px solid var(--border);border-radius:18px;
+  padding:36px 32px;backdrop-filter:blur(10px);
+  box-shadow:0 20px 60px rgba(0,0,0,0.5)
+}
+h1{
+  font-family:'Orbitron',sans-serif;font-size:22px;font-weight:900;
+  background:linear-gradient(135deg,var(--gold),var(--gold-glow));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:0.05em;text-align:center;margin-bottom:6px
+}
+.sub{text-align:center;color:var(--text-3);font-size:11px;letter-spacing:0.15em;margin-bottom:30px;font-family:'Orbitron',sans-serif}
+.notice{
+  padding:14px;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.3);
+  border-radius:10px;font-size:12px;color:var(--purple);line-height:1.7;margin-bottom:24px
+}
+.label{
+  display:block;font-family:'Orbitron',sans-serif;font-size:10px;
+  letter-spacing:0.15em;color:var(--gold);margin-bottom:8px;margin-top:18px
+}
+input[type="password"], input[type="text"]{
+  width:100%;padding:13px 16px;background:rgba(0,0,0,0.4);
+  border:1px solid var(--border);border-radius:10px;color:var(--text-1);
+  font-family:'JetBrains Mono',monospace;font-size:15px;letter-spacing:0.05em;
+  outline:none;transition:all 0.3s
+}
+input:focus{border-color:var(--gold);box-shadow:0 0 20px rgba(212,168,67,0.3)}
+.format-grid{
+  display:grid;grid-template-columns:1fr;gap:8px;margin-top:10px
+}
+.format-option{
+  padding:14px 16px;background:rgba(0,0,0,0.3);border:1px solid var(--border);
+  border-radius:10px;cursor:pointer;transition:all 0.25s;display:flex;align-items:center;gap:12px
+}
+.format-option:hover{border-color:var(--gold)}
+.format-option.selected{
+  border-color:var(--gold);background:rgba(212,168,67,0.1);
+  box-shadow:0 0 20px rgba(212,168,67,0.2)
+}
+.format-radio{
+  width:18px;height:18px;border:2px solid var(--border);border-radius:50%;
+  flex-shrink:0;position:relative
+}
+.format-option.selected .format-radio{border-color:var(--gold)}
+.format-option.selected .format-radio::after{
+  content:'';position:absolute;inset:3px;background:var(--gold);border-radius:50%
+}
+.format-info{flex:1}
+.format-name{font-size:13px;font-weight:700;color:var(--text-1)}
+.format-example{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-3);margin-top:3px}
+.btn{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-glow));
+  border:none;border-radius:10px;color:var(--void);
+  font-family:'Orbitron',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:0.15em;cursor:pointer;margin-top:24px;transition:all 0.2s
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(212,168,67,0.4)}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.result{
+  margin-top:24px;padding:16px;border-radius:10px;font-size:12px;line-height:1.7;
+  font-family:'JetBrains Mono',monospace
+}
+.result.success{background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.4);color:var(--green)}
+.result.error{background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.4);color:var(--red)}
+.token-box{
+  margin-top:14px;padding:12px;background:rgba(0,0,0,0.5);
+  border-radius:8px;word-break:break-all;font-size:10px;color:var(--text-2)
+}
+.copy-btn{
+  display:block;width:100%;padding:10px;margin-top:10px;
+  background:rgba(212,168,67,0.1);border:1px solid var(--gold);
+  border-radius:8px;color:var(--gold);font-family:'Orbitron',sans-serif;
+  font-size:11px;font-weight:700;letter-spacing:0.1em;cursor:pointer
+}
+.copy-btn:hover{background:rgba(212,168,67,0.2)}
+.foot{margin-top:30px;text-align:center;font-size:10px;color:var(--text-3);letter-spacing:0.15em;font-family:'Orbitron',sans-serif}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h1>⚡ CGO-FULI 사령탑 등록</h1>
+  <div class="sub">大將 이주원 · L.J.R · MUFE 본번호 등록</div>
+
+  <div class="notice">
+    <strong style="color:var(--gold)">⚠️ 1회만 등록</strong><br>
+    이 페이지에서 본번호 + 형식을 등록하면 토큰이 발급됩니다.<br>
+    토큰을 복사해 두세요 — 매번 입장할 때 필요합니다.<br>
+    <strong style="color:var(--gold)">서버에는 해시만 저장</strong> — 본번호 자체는 大將만 아십니다.
+  </div>
+
+  <label class="label">大將 본번호 (양자도 못 푸는 비밀)</label>
+  <input type="password" id="passcode" placeholder="예: 주원77 또는 LJR1980 (대장님만)" autocomplete="off">
+
+  <label class="label">답 결합 형식 (4가지 중 1가지)</label>
+  <div class="format-grid">
+    <div class="format-option" data-fmt="joined-after">
+      <div class="format-radio"></div>
+      <div class="format-info">
+        <div class="format-name">본번호 + 단어 (붙여쓰기)</div>
+        <div class="format-example">예: 주원77 + 사냥 → "주원77사냥"</div>
+      </div>
+    </div>
+    <div class="format-option" data-fmt="spaced-after">
+      <div class="format-radio"></div>
+      <div class="format-info">
+        <div class="format-name">본번호 + 공백 + 단어</div>
+        <div class="format-example">예: 주원77 + 사냥 → "주원77 사냥"</div>
+      </div>
+    </div>
+    <div class="format-option" data-fmt="joined-before">
+      <div class="format-radio"></div>
+      <div class="format-info">
+        <div class="format-name">단어 + 본번호 (붙여쓰기)</div>
+        <div class="format-example">예: 사냥 + 주원77 → "사냥주원77"</div>
+      </div>
+    </div>
+    <div class="format-option" data-fmt="spaced-before">
+      <div class="format-radio"></div>
+      <div class="format-info">
+        <div class="format-name">단어 + 공백 + 본번호</div>
+        <div class="format-example">예: 사냥 + 주원77 → "사냥 주원77"</div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" id="submitBtn" onclick="register()">등록 + 토큰 발급</button>
+
+  <div id="result"></div>
+
+  <div class="foot">
+    PCT 10-2026-0060113 · MUFE 인류사 첫 적용 · C-35
+  </div>
+</div>
+
+<script>
+let _format = null;
+
+document.querySelectorAll('.format-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    document.querySelectorAll('.format-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+    _format = opt.dataset.fmt;
+  });
+});
+
+async function register() {
+  const passcode = document.getElementById('passcode').value.trim();
+  const result = document.getElementById('result');
+  const btn = document.getElementById('submitBtn');
+
+  if (!passcode) {
+    result.className = 'result error';
+    result.innerHTML = '⚠ 본번호를 입력하세요';
+    return;
+  }
+  if (!_format) {
+    result.className = 'result error';
+    result.innerHTML = '⚠ 결합 형식을 선택하세요';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '등록 중...';
+
+  try {
+    const res = await fetch('/api/register', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({passcode, format: _format})
+    });
+    const data = await res.json();
+
+    if (data.status === 'success' && data.token) {
+      // localStorage에 토큰 저장
+      localStorage.setItem('mufe_user_token', data.token);
+      localStorage.setItem('mufe_user_format', _format);
+
+      result.className = 'result success';
+      result.innerHTML = '✅ ' + data.message + '<br>' +
+        '<small>' + (data.detail || '') + '</small>' +
+        '<div class="token-box">' + data.token + '</div>' +
+        '<button class="copy-btn" onclick="copyToken(\'' + data.token + '\')">📋 토큰 복사 (안전한 곳에 보관)</button>' +
+        '<button class="copy-btn" onclick="goAdmin()" style="margin-top:8px">⚡ 사령탑 입구로 이동</button>';
+    } else {
+      result.className = 'result error';
+      result.innerHTML = '⚠ ' + (data.error || '등록 실패');
+    }
+  } catch (e) {
+    result.className = 'result error';
+    result.innerHTML = '⚠ 네트워크 오류: ' + e.message;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '등록 + 토큰 발급';
+  }
+}
+
+function copyToken(token) {
+  navigator.clipboard.writeText(token).then(() => {
+    alert('토큰이 클립보드에 복사되었습니다. 안전한 곳에 보관하세요.');
+  }).catch(() => {
+    prompt('토큰을 수동으로 복사하세요:', token);
+  });
+}
+
+function goAdmin() {
+  location.href = '/';
+}
+</script>
+
+</body>
+</html>
