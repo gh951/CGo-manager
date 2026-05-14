@@ -884,11 +884,41 @@ window.addEventListener('DOMContentLoaded', () => {
   // ★★★ MUFE 봇 자동 격리 — ref 파라미터로 들어온 봇은 즉시 abyss ★★★
   // FULI 메인 앱의 mufe-card.js에서 봇 감지 후 redirect 한 경우
   try {
-    const params = new URLSearchParams(location.search);
-    const ref = params.get('ref');
-    const botRefs = ['honey', 'fuli-stealth', 'fuli-auto', 'honey-card', 'honey-fetch'];
+    // ★ 화이트 봇 (검색엔진, 공유 미리보기) 보호 ★
+    // 정상 봇이 잘못 abyss로 가면 SEO + 공유 미리보기 망함
+    const _ua = (navigator.userAgent || '').toLowerCase();
+    // 大將 FULI = Groq AI 사용. AI 학습 봇(GPT/Claude/Gemini)은 차단 OK
+    const WHITELIST = [
+      // 검색엔진
+      'googlebot','google-inspectiontool','mediapartners-google','adsbot-google',
+      'bingbot','slurp','duckduckbot','baiduspider','yandexbot',
+      'applebot','mj12bot','ahrefsbot','semrushbot',
+      // 한국
+      'yeti','naverbot','daumoa','cocolinkbot',
+      // 공유 미리보기
+      'facebookexternalhit','facebookcatalog','twitterbot','linkedinbot',
+      'whatsapp','telegrambot','discordbot','slackbot',
+      'kakaotalk-scrap','kakaotalk','line-poker','naver share',
+      'pinterestbot','redditbot',
+      // AI 실시간 검색 (학습 X)
+      'perplexitybot','youbot',
+      // 大將 자체
+      'cgo-fuli',
+      // 모니터링
+      'archive.org_bot','wayback','uptimerobot','pingdom','newrelic','datadog','statuspage','vercel'
+    ];
+    const isWhiteBot = WHITELIST.some(p => _ua.indexOf(p) !== -1);
     
-    if (ref && botRefs.indexOf(ref) !== -1) {
+    if (isWhiteBot) {
+      console.log('[MUFE] ✅ 화이트 봇 감지 — 정상 페이지 표시 (SEO 보호)');
+      // 화이트 봇은 ref 무시 + 정상 페이지 표시
+      // (검색엔진/공유 봇이 admin URL 인덱싱해도 정상 화면 보여줌)
+    } else {
+      const params = new URLSearchParams(location.search);
+      const ref = params.get('ref');
+      const botRefs = ['honey', 'fuli-stealth', 'fuli-auto', 'honey-card', 'honey-fetch'];
+      
+      if (ref && botRefs.indexOf(ref) !== -1) {
       console.log('[MUFE] 🎭 봇 감지 자동 격리: ref=' + ref);
       // 봇 정보 logging (관리용)
       try {
@@ -913,6 +943,7 @@ window.addEventListener('DOMContentLoaded', () => {
         document.documentElement.style.cssText = 'opacity:0;pointer-events:none'; 
       } catch(e) {}
       return; // 다음 코드 실행 안 함
+      }
     }
   } catch (e) {
     console.warn('[MUFE] ref 분석 에러:', e);
