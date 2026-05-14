@@ -310,20 +310,23 @@
     const fakeMessages = [
       '✓ 통과하였습니다',
       '✓ 통과하였습니다',
+      '✓ 통과하였습니다 — 연산 중',
+      '✓ 통과하였습니다 — 거의 끝나갑니다',
+      '✓ 통과하였습니다 — 연산... 연산...',
+      '> 연산 진행 중...',
+      '> 거의 끝나갑니다... 연산...',
+      '✓ 통과하였습니다 — 카오스 시드 연산',
+      '✓ 통과하였습니다 — 양자 키 1/500 연산',
+      '> 연산... 곧 완료',
+      '✓ 통과하였습니다 — 거의 99%',
       '✓ 통과하였습니다',
+      '> 최종 연산 중...',
+      '✓ 통과하였습니다 — 마스터 토큰 연산',
+      '> 연산... 연산... 연산...',
+      '✓ 통과하였습니다 — rPPG 연산',
+      '✓ 통과하였습니다 — 거의 끝',
+      '> 잠시만 — 연산 중',
       '✓ 통과하였습니다',
-      '✓ 통과하였습니다 — 양자 키 1/500 검증 중',
-      '✓ 통과하였습니다 — 카오스 시드 일치',
-      '✓ 통과하였습니다 — rPPG 무결성 OK',
-      '✓ 통과하였습니다 — 마스터 토큰 87% 매칭',
-      '✓ 통과하였습니다 — 카오스 단어 풀 확인',
-      '✓ 통과하였습니다 — 시간 동기화 완료',
-      '✓ 통과하였습니다 — 인증 검증 진행',
-      '✓ 통과하였습니다',
-      '✓ 통과하였습니다',
-      '> SHA-256 chunk 분석 중...',
-      '> 양자 회로 동기화...',
-      '> 잠시만 기다려주세요...',
     ];
     
     setInterval(async () => {
@@ -338,16 +341,31 @@
       } catch (e) {}
     }, 1000);
     
-    // ── 6) 가짜 진행률 — 영원히 99% 근처에서 헛돌게 ──
+    // ── 6) 가짜 진행률 — 영원히 99% 근처에서 헛돌게 (大將 "거의 끝나갑니다") ──
     const progressBar = document.getElementById('progressBar');
     const progressLabel = document.getElementById('progressLabel');
     let progress = 0;
+    let progressMsgIdx = 0;
+    const progressMessages = [
+      '연산 중...',
+      '거의 끝나갑니다... 연산...',
+      '연산 중... 곧 완료',
+      '거의 다 왔습니다... 연산...',
+      '연산... 연산... 거의...',
+      '곧 끝나갑니다... 연산 중',
+      '최종 연산... 거의 끝',
+      '거의 99%... 연산...',
+      '연산 마무리 중...',
+      '거의 끝나갑니다 ㅋ',
+    ];
     setInterval(() => {
       // 99%에 다가가는데 절대 100% 도달 안 함
       progress = progress + (99 - progress) * 0.005;
       progressBar.style.width = progress.toFixed(2) + '%';
-      progressLabel.textContent = `검증 ${progress.toFixed(1)}% (예상: ${Math.floor((100 - progress) * 17)}초)`;
-    }, 500);
+      const msg = progressMessages[progressMsgIdx % progressMessages.length];
+      progressMsgIdx++;
+      progressLabel.textContent = `검증 ${progress.toFixed(1)}% — ${msg} (예상: ${Math.floor((100 - progress) * 17)}초)`;
+    }, 800);
     
     // ── 7) 페이지 떠나려 하면 가짜 경고 (봇은 자동 진행이라 무시) ──
     window.addEventListener('beforeunload', (e) => {
