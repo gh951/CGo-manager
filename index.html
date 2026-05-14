@@ -224,9 +224,9 @@ body::before{content:'';position:fixed;inset:0;background:
 .start-instruction strong{color:var(--text-1)}
 
 .formula-banner{
-  text-align:center;padding:12px;margin-bottom:16px;
-  background:rgba(212,168,67,0.08);border:1px solid var(--gold);
-  border-radius:10px;color:var(--gold);font-weight:700;font-size:14px;letter-spacing:0.05em
+  text-align:center;padding:14px;margin-bottom:16px;
+  background:#fef3c7;border:1px solid #fbbf24;
+  border-radius:10px;color:#b45309;font-weight:700;font-size:14px;letter-spacing:0.05em
 }
 
 /* STOP 버튼 */
@@ -288,22 +288,22 @@ body::before{content:'';position:fixed;inset:0;background:
 /* 상태 박스 */
 .status-box{
   display:flex;justify-content:space-between;align-items:center;
-  padding:12px 16px;background:rgba(212,168,67,0.06);
-  border:1px solid var(--border);border-radius:10px;font-size:12px;margin-bottom:14px
+  padding:14px 18px;background:#fef3c7;
+  border:1px solid #fbbf24;border-radius:10px;font-size:13px;margin-bottom:14px
 }
-.status-box .left{color:var(--gold)}
+.status-box .left{color:#b45309;font-weight:700}
 .status-box .right{
-  padding:6px 12px;background:rgba(212,168,67,0.1);
-  border:1px solid var(--gold);border-radius:6px;
-  font-family:'Orbitron',sans-serif;font-size:11px;color:var(--gold);
-  cursor:pointer;font-weight:700;letter-spacing:0.05em
+  padding:8px 14px;background:rgba(212,168,67,0.12);
+  border:1px solid var(--gold);border-radius:8px;
+  font-family:'Noto Sans KR',sans-serif;font-size:12px;color:var(--gold);
+  cursor:pointer;font-weight:700
 }
 
 /* "보이는 게 진실이 아니다" */
 .truth-quote{
-  text-align:center;font-style:italic;font-size:12px;
-  color:var(--text-3);letter-spacing:0.15em;
-  font-family:'Noto Sans KR',sans-serif;font-weight:300;margin-top:10px
+  text-align:center;font-style:italic;font-size:15px;
+  color:var(--text-2);letter-spacing:0.25em;
+  font-family:'Noto Sans KR',sans-serif;font-weight:400;margin-top:16px
 }
 
 /* C-35 박제 */
@@ -480,7 +480,7 @@ body::before{content:'';position:fixed;inset:0;background:
     <!-- 토글 -->
     <div class="mode-toggle">
       <div class="mode-btn register active" id="modeRegister" onclick="setMode('register')">
-        🆕 비번 만들기 (처음)
+        <span style="display:inline-block;padding:2px 8px;background:rgba(255,255,255,0.25);border-radius:6px;font-size:9px;font-weight:900;margin-right:6px;letter-spacing:0.05em">NEW</span> 비번 만들기 (처음)
       </div>
       <div class="mode-btn start" id="modeStart" onclick="setMode('start')">
         🚀 시작하기
