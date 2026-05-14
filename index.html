@@ -880,7 +880,13 @@ let _caughtWord = null;
 window.addEventListener('DOMContentLoaded', () => {
   if (_userToken) {
     setMode('start');
-    autoStartChallenge();
+    // ★ 이미지 암호 등록자는 이미지 통과까지 챌린지 X ★
+    const savedImgHash = localStorage.getItem('mufe_img_pw_hash');
+    if (!savedImgHash) {
+      // 이미지 암호 없는 사용자만 자동 챌린지
+      autoStartChallenge();
+    }
+    // 이미지 암호 등록자는 handleImgUpload에서 통과 후 자동 챌린지 시작
   }
   initFirebase();
 });
